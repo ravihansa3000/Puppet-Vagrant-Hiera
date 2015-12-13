@@ -1,0 +1,9 @@
+---
+classes :
+  - 'basic_package'
+basic_package :
+  - 'unzip'
+basic_erase_package :
+  -
+gem_package :
+  -
