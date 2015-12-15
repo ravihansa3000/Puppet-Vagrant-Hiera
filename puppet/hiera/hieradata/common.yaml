@@ -9,4 +9,5 @@ owner: wso2user
 group: wso2
 securevault: false
 install_mode: file_bucket
-packages: []
+packages:
+  - unzip
