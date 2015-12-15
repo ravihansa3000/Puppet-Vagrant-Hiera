@@ -1,5 +1,5 @@
 ---
-maintenance_mode: refresh
+maintenance_mode: zero
 install_mode: file_bucket
 install_dir: /mnt
 pack_dir: /mnt/packs

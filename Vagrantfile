@@ -9,7 +9,7 @@ IP_ADDR = "172.17.8.20"
 BASE_DOMAIN = "local.dev.wso2.org"
 
 nodes = [
-   { :hostname => 'dev-sandbox', :box => 'ubuntu/trusty64', :ram => '1024'},
+   { :hostname => 'dev-sandbox', :box => 'ubuntu/trusty64', :ram => '1500'},
 ]
 
 
