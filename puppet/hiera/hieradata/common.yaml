@@ -1,0 +1,12 @@
+---
+maintenance_mode: refresh
+install_mode: file_bucket
+target_dir: /mnt
+packs_dir: /mnt/packs
+offset: 0
+depsync: false
+owner: wso2user
+group: wso2
+securevault: false
+install_mode: file_bucket
+packages: []
