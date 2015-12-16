@@ -12,3 +12,8 @@ install_mode: file_bucket
 patches_dir: repository/components/patches
 packages:
   - unzip
+java_deploymentdir: jdk-7u80
+java_source_file: jdk-7u80-linux-x64.tar.gz
+
+# symlink to Java install directory
+java_home: /opt/java

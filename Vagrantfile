@@ -9,7 +9,7 @@ IP_ADDR = "172.17.8.20"
 BASE_DOMAIN = "local.dev.wso2.org"
 
 nodes = [
-   { :hostname => 'dev-sandbox', :box => 'ubuntu/trusty64', :ram => '1500'},
+   { :hostname => 'dev-sandbox', :box => 'ubuntu/trusty64', :ram => '2048'},
 ]
 
 
@@ -21,7 +21,7 @@ Vagrant.configure(2) do |config|
          node_config.vm.box = node[:box]
          node_config.vm.host_name = node[:hostname] + '.' + BASE_DOMAIN
          node_config.vm.network :private_network, ip: IP_ADDR
-         node_config.vm.synced_folder("puppet", "/puppet")
+         node_config.vm.synced_folder("/etc/puppet/files", "/puppet-files")
          memory = node[:ram] ? node[:ram] : 256;
 
          config.vm.provider :virtualbox do |vb|
@@ -31,9 +31,10 @@ Vagrant.configure(2) do |config|
             vb.customize [
                'modifyvm', :id,
                '--name', node[:hostname],
-               # '--resize', '5120'
+            #   '--resize', '5120',
                '--memory', memory.to_s
-         ]
+            ]
+
          end
       end
    end
@@ -43,6 +44,10 @@ $script = <<EOF
    if [ ! -d /etc/puppet/modules/stdlib ]; then
       puppet module install puppetlabs/stdlib
    fi
+   if [ ! -d /etc/puppet/modules/java ]; then
+      puppet module install 7terminals-java
+   fi
+
 EOF
 
    config.vm.provision :shell do |shell|
@@ -54,9 +59,9 @@ EOF
       puppet.manifest_file = 'site.pp'
       puppet.module_path = ['/home/akila/Documents/WSO2/WSO2-GitHub/Puppet-Modules.git',
                             '/etc/puppet/modules']
-      puppet.options = "--verbose --debug"
+      puppet.options = "--verbose --debug --fileserverconfig=/vagrant/fileserver.conf"
       puppet.hiera_config_path = 'puppet/hiera/hiera.yaml'
-      puppet.working_directory = '/puppet'
+      puppet.working_directory = '/vagrant/puppet'
 
       # custom facts provided to Puppet
       # turn on/off vm_type variable to see diffrent behaviour
