@@ -1,43 +1,32 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+# require YAML module
+require 'yaml'
 
-# Global properties for Puppet Vagrant setup
-
-IP_ADDR = "172.17.8.20"
-
-BASE_DOMAIN = "local.dev.wso2.org"
-
-nodes = [
-   { :hostname => 'dev-sandbox', :box => 'ubuntu/trusty64', :ram => '2048'},
-]
-
+# load server config from YAML file
+servers = YAML.load_file('servers.yaml')
 
 Vagrant.configure(2) do |config|
 
-   nodes.each do |node|
+ servers.each do |server|
 
-      config.vm.define node[:hostname] do |node_config|
-         node_config.vm.box = node[:box]
-         node_config.vm.host_name = node[:hostname] + '.' + BASE_DOMAIN
-         node_config.vm.network :private_network, ip: IP_ADDR
-         node_config.vm.synced_folder("/etc/puppet/files", "/puppet-files")
-         memory = node[:ram] ? node[:ram] : 256;
+    config.vm.define server["hostname"] do |server_config|
+       server_config.vm.box = server["box"]
+       server_config.vm.host_name = server["hostname"]
+       server_config.vm.network :private_network, ip: server["ip"]
+       server_config.vm.synced_folder("/etc/puppet/files", "/puppet-files")
+       memory = server["ram"] ? server["ram"] : 256;
 
-         config.vm.provider :virtualbox do |vb|
-            vb.check_guest_additions = false
-            vb.functional_vboxsf = false
-            vb.gui = false
-            vb.customize [
-               'modifyvm', :id,
-               '--name', node[:hostname],
-            #   '--resize', '5120',
-               '--memory', memory.to_s
-            ]
-
-         end
-      end
-   end
+       server_config.vm.provider :virtualbox do |vb|
+	  vb.name = server["hostname"]
+          vb.check_guest_additions = false
+          vb.functional_vboxsf = false
+          vb.gui = false
+	  vb.customize ["modifyvm", :id, "--groups", "/WSO2 Development"]
+          vb.customize ["modifyvm", :id, "--memory", server["ram"]]
+          vb.customize ["modifyvm", :id, "--cpus", server["cpu"]]
+       end
 
 $script = <<EOF
    mkdir -p /etc/puppet/modules;
@@ -47,30 +36,31 @@ $script = <<EOF
    if [ ! -d /etc/puppet/modules/java ]; then
       puppet module install 7terminals-java
    fi
-
 EOF
 
-   config.vm.provision :shell do |shell|
-      shell.inline = $script
-   end
+      server_config.vm.provision :shell do |shell|
+         shell.inline = $script
+      end
 
-   config.vm.provision :puppet do |puppet|
-      puppet.manifests_path = 'puppet/manifests'
-      puppet.manifest_file = 'site.pp'
-      puppet.module_path = ['/home/akila/Documents/WSO2/WSO2-GitHub/Puppet-Modules.git',
+      server_config.vm.provision :puppet do |puppet|
+         puppet.manifests_path = 'puppet/manifests'
+         puppet.manifest_file = 'site.pp'
+         puppet.module_path = ['/home/rajkumar/projects/wso2/public/puppet-modules',
                             '/etc/puppet/modules']
-      puppet.options = "--verbose --debug --fileserverconfig=/vagrant/fileserver.conf"
-      puppet.hiera_config_path = 'puppet/hiera/hiera.yaml'
-      puppet.working_directory = '/vagrant/puppet'
+         puppet.options = "--verbose --debug --fileserverconfig=/vagrant/fileserver.conf"
+         puppet.hiera_config_path = 'puppet/hiera/hiera.yaml'
+         puppet.working_directory = '/vagrant/puppet'
 
-      # custom facts provided to Puppet
-      # turn on/off vm_type variable to see diffrent behaviour
-      puppet.facter = {
-          "environment"     => "dev",
-          "vm_type"         => "vagrant",
-          "product_name"    => "wso2am",
-          "product_version" => "1.9.1",
-          "product_profile" => "default"
-      }
-   end
+         # custom facts provided to Puppet
+         # turn on/off vm_type variable to see diffrent behaviour
+         puppet.facter = {
+             "environment"     => server["environment"],
+             "vm_type"         => server["vm_type"],
+             "product_name"    => server["product_name"],
+             "product_version" => server["product_version"],
+             "product_profile" => server["product_profile"]
+         }
+      end
+    end
+ end 
 end
