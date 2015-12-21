@@ -1,0 +1,33 @@
+---
+servers:
+  -
+    hostname: dev-sandbox-apim.local.dev.wso2.org
+    facters:
+      product_name: wso2am
+      product_version: 1.9.1
+      product_profile: default
+      environment: dev
+      vm_type: vagrant
+    box: ubuntu/trusty64
+    ip: 192.168.100.10
+    ram: 2048
+    cpu: 1
+  -
+    hostname: dev-sandbox-store.local.dev.wso2.org
+    facters:
+      product_name: wso2am
+      product_version: 1.9.1
+      product_profile: default
+      environment: dev
+      vm_type: vagrant
+    box: ubuntu/trusty64
+    ip: 192.168.100.20
+    ram: 2048
+    cpu: 1
+    enabled: false
+puppet:
+  hiera_path: /home/akila/Documents/WSO2/WSO2-GitHub/Puppet-Modules.git/hiera
+  manifests_path: /home/akila/Documents/WSO2/WSO2-GitHub/Puppet-Modules.git/manifests
+  module_path: ['/home/akila/Documents/WSO2/WSO2-GitHub/Puppet-Modules.git', '/etc/puppet/modules']
+  hiera_config_path: /home/akila/Documents/WSO2/WSO2-GitHub/Puppet-Modules.git/hiera/hiera.yaml
+  working_directory: /puppet-hiera
