@@ -5,7 +5,7 @@
 require 'yaml'
 
 # load server config from YAML file
-CONFIGURATION_YAML = YAML.load_file('servers.yaml')
+CONFIGURATION_YAML = YAML.load_file('config.yaml')
 $puppet_lib_install_script = <<EOF
    mkdir -p /etc/puppet/modules;
    if [ ! -d /etc/puppet/modules/stdlib ]; then
