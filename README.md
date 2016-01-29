@@ -1,6 +1,6 @@
 # Puppet Vagrant
 
-A vagrant for setting up WSO2 servers using puppet and hiera. Originally created by (Akila Ravihansa) [https://github.com/ravihansa3000].
+A vagrant for setting up WSO2 servers using puppet and hiera. Originally created by [Akila Ravihansa] (https://github.com/ravihansa3000).
 
 ## How to use
 
