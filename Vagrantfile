@@ -25,8 +25,7 @@ Vagrant.configure(2) do |config|
 				server_config.vm.box = server["box"]
 				server_config.vm.host_name = server["hostname"]
 				server_config.vm.network :private_network, ip: server["ip"]
-				server_config.vm.synced_folder("/etc/puppet/files", "/puppet-files")
-        server_config.vm.synced_folder(CONFIGURATION_YAML["puppet"]["hiera_path"], "/puppet-hiera")
+        server_config.vm.synced_folder(CONFIGURATION_YAML["puppet"]["puppet_home"] + "/hieradata", "/puppet/hieradata")
 				memory = server["ram"] ? server["ram"] : 256;
 
 				server_config.vm.provider :virtualbox do |vb|
@@ -34,7 +33,7 @@ Vagrant.configure(2) do |config|
 					vb.check_guest_additions = false
 					vb.functional_vboxsf = false
 					vb.gui = false
-					vb.customize ["modifyvm", :id, "--groups", "/WSO2 Puppet Development"]
+					vb.customize ["modifyvm", :id, "--groups", "/WSO2-Puppet-Dev"]
 					vb.customize ["modifyvm", :id, "--memory", server["ram"]]
 					vb.customize ["modifyvm", :id, "--cpus", server["cpu"]]
 				end
@@ -44,15 +43,13 @@ Vagrant.configure(2) do |config|
 				end
 
 				server_config.vm.provision :puppet do |puppet|
-					puppet.manifests_path = CONFIGURATION_YAML["puppet"]["manifests_path"]
-					puppet.manifest_file = 'site.pp'
-					puppet.module_path = CONFIGURATION_YAML["puppet"]["module_path"]
-					puppet.options = "--verbose --debug --fileserverconfig=/vagrant/fileserver.conf"
-					puppet.hiera_config_path = CONFIGURATION_YAML["puppet"]["hiera_config_path"]
-					puppet.working_directory = CONFIGURATION_YAML["puppet"]["working_directory"]
+          puppet.manifest_file = 'site.pp'
+					puppet.manifests_path = CONFIGURATION_YAML["puppet"]["puppet_home"] + "/manifests"
+					puppet.module_path = CONFIGURATION_YAML["puppet"]["puppet_home"] + "/modules"
+					puppet.hiera_config_path = CONFIGURATION_YAML["puppet"]["puppet_home"] + "/hiera.yaml"
+					puppet.working_directory = "/puppet"
 
 					# custom facts provided to Puppet
-					# turn on/off vm_type variable to see diffrent behaviour
 					puppet.facter = server["facters"]
 				end
 			end
